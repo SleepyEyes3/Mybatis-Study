@@ -6,4 +6,26 @@
     <select id="getUserList" resultType="com.jxy.dao.pojo.User">
         select * from mybatis.user
     </select>
+
+<!--    根据id查询用户-->
+    <select id="getUserById" parameterType="int" resultType="com.jxy.dao.pojo.User">
+        select * from mybatis.user where id=#{id}
+    </select>
+
+<!--    添加用户-->
+    <insert id="insertUser" parameterType="com.jxy.dao.pojo.User">
+        insert into mybatis.user (id,name,pwd) values (#{id},#{name},#{pwd})
+    </insert>
+
+<!--    更新用户-->
+    <update id="updateUser" parameterType="com.jxy.dao.pojo.User">
+        update mybatis.user set name=#{name},pwd=#{pwd} where id=#{id}
+    </update>
+
+<!--    删除用户-->
+    <delete id="deleteUserById" parameterType="int">
+        delete from mybatis.user where id=#{id}
+    </delete>
 </mapper>
+
+
