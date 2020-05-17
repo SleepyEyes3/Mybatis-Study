@@ -1,4 +1,4 @@
-#### **需要注意的点**
+##### **需要注意的点**
 
 ##### 1、关于Map传参的使用
 
@@ -138,7 +138,7 @@ select id,name,pwd as password from uesr where id=1；
 
 ##### 8、日志的使用
 
-1、导入依赖
+###### 1、导入依赖
 
 ```xml
 <dependency>
@@ -148,7 +148,7 @@ select id,name,pwd as password from uesr where id=1；
 </dependency>
 ```
 
-2、在xml里面进行配置
+###### 2、在xml里面进行配置
 
 ```xml
     <settings>
@@ -157,7 +157,7 @@ select id,name,pwd as password from uesr where id=1；
     </settings>
 ```
 
-3、设置**log4j.properties**文件的配置
+###### 3、设置**log4j.properties**文件的配置
 
 ```
 #将等级为DEBUG的日志信息输出到console和file两个目的地
@@ -186,7 +186,7 @@ log4j.logger.java.sql.ResultSet=DEBUG
 log4j.logger.java.sql.PreparedStatement=DEBUG
 ```
 
-4、使用……
+###### 4、使用
 
 ```java
 public class Test1 {
@@ -211,7 +211,9 @@ public class Test1 {
 
 ##### 9、分页
 
-1、使用map传参的方法
+------
+
+###### 1、使用map传参的方法
 
 * SQL语句的编写
 
@@ -230,6 +232,26 @@ map.put("pageSize",2);
 List<User> userList = mapper.getUserLimit(map);
 ```
 
-2、RowBounds
+###### 2、RowBounds
 
-3、Mybatis分页插件
+###### 3、Mybatis分页插件
+
+##### 10、使用注解开发
+
+------
+
+###### 10.1、这边有一个Mybatis的内部实现逻辑看一下视频17
+
+###### 10.2、注解模式下的CRUD
+
+###### 10.3、关于@Param()注解
+
+* 基本类型的参数或者String类型，需要加上
+* 引用类型不需要加
+* 如果只有一个基本类型的话，可以忽略，但是建议还是加上
+* 我们在SQL中引用的就是@Param()中设定的属性名
+
+###### 10.4Lombok的使用
+
+
+

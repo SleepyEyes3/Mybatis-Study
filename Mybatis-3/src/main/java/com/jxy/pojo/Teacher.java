@@ -3,8 +3,8 @@ package com.jxy.pojo;
 import lombok.Data;
 
 @Data
-public class User {
-    private int id;
+public class Teacher {
+    private Integer id;
     private String name;
-    private String password;
 }
+
