@@ -1,4 +1,4 @@
-package com.jxy.dao.pojo;
+package com.jxy.pojo;
 
 public class User {
     private int id;
