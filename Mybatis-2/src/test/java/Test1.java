@@ -33,4 +33,18 @@ public class Test1 {
         sqlSession.close();
     }
 
+    @Test
+    public void getUserListByLimit(){
+
+        SqlSession sqlSession = MybatisUtils.getSqlSession();
+        UserDao mapper = sqlSession.getMapper(UserDao.class);
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("startIndex",2);
+        map.put("pageSize",2);
+        List<User> userList = mapper.getUserLimit(map);
+        for(User user:userList){
+            System.out.println(user);
+        }
+        sqlSession.close();
+    }
 }

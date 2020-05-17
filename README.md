@@ -1,12 +1,12 @@
 #### **需要注意的点**
 
-###### 1、关于Map传参的使用
+##### 1、关于Map传参的使用
 
 * Map传递参数，直接在sql中取出key即可
 * 对象传递参数，直接在sql中取对象的属性即可
 * 只有一个基本类型参数的情况下，可以直接在sql中取到
 
-###### 2、关于模糊查询
+##### 2、关于模糊查询
 
 * Java代码执行的时候，传递通配符% %
 
@@ -28,7 +28,7 @@
     </select>
     ```
 
-###### 3、xml配置
+##### 3、xml配置
 
 注意：*xml中的标签的顺序有一定的要求，不能够随意改动标签位置*。
 
@@ -77,13 +77,13 @@ public class Author {
 }
 ```
 
-###### 4、一些重要的配置
+##### 4、一些重要的配置
 
 ![image-20200517090519359](C:\Users\10715\AppData\Roaming\Typora\typora-user-images\image-20200517090519359.png)
 
 ![image-20200517090611975](C:\Users\10715\AppData\Roaming\Typora\typora-user-images\image-20200517090611975.png)
 
-###### 5、映射器（Mappers）
+##### 5、映射器（Mappers）
 
 MapperRegistry注册绑定Mapper文件
 
@@ -108,9 +108,9 @@ MapperRegistry注册绑定Mapper文件
 </mappers>
 ```
 
-###### 6、生命周期与作用域
+##### 6、生命周期与作用域
 
-###### 7、解决属性名与字段名不一致的问题
+##### 7、解决属性名与字段名不一致的问题
 
 * 在sql语句中使用as语法
 
@@ -136,7 +136,7 @@ select id,name,pwd as password from uesr where id=1；
 </select>
 ```
 
-###### 8、日志的使用
+##### 8、日志的使用
 
 1、导入依赖
 
@@ -186,7 +186,7 @@ log4j.logger.java.sql.ResultSet=DEBUG
 log4j.logger.java.sql.PreparedStatement=DEBUG
 ```
 
-4、使用
+4、使用……
 
 ```java
 public class Test1 {
@@ -209,3 +209,27 @@ public class Test1 {
 }
 ```
 
+##### 9、分页
+
+1、使用map传参的方法
+
+* SQL语句的编写
+
+```sql
+<select id="getUserLimit" resultType="map" resultMap="userMap">
+    select * from mybatis.user limit #{startIndex},#{pageSize}
+</select>
+```
+
+* 参数的传入
+
+```java
+Map<String, Integer> map = new HashMap<String, Integer>();
+map.put("startIndex",2);
+map.put("pageSize",2);
+List<User> userList = mapper.getUserLimit(map);
+```
+
+2、RowBounds
+
+3、Mybatis分页插件
