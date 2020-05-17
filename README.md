@@ -253,5 +253,33 @@ List<User> userList = mapper.getUserLimit(map);
 
 ###### 10.4Lombok的使用
 
+##### 11、多对一的处理
 
+###### （1）表的创建
+
+```sql
+CREATE TABLE `teacher` (
+`id` INT(10) NOT NULL,
+`name` VARCHAR(30) DEFAULT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+INSERT INTO teacher(`id`, `name`) VALUES (1, '秦老师'); 
+
+CREATE TABLE `student` (
+`id` INT(10) NOT NULL,
+`name` VARCHAR(30) DEFAULT NULL,
+`tid` INT(10) DEFAULT NULL,
+PRIMARY KEY (`id`),
+KEY `fktid` (`tid`),
+CONSTRAINT `fktid` FOREIGN KEY (`tid`) REFERENCES `teacher` (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('1', '小明', '1'); 
+INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('2', '小红', '1'); 
+INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('3', '小张', '1'); 
+INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('4', '小李', '1'); 
+INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('5', '小王', '1');
+```
+
+###### （2）环境搭建
 
