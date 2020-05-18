@@ -531,3 +531,149 @@ set**标签主要用于去除更新语句中条件后面的逗号**
 </select>
 ```
 
+##### 14、缓存
+
+###### 14.1、Mybatis缓存
+
+（1）MyBatis包含一个非常强大的查询缓存特性，它可以非常方便地定制和配置缓存。缓存可以极大的提升查询效率。
+
+（2）MyBatis系统中默认定义了两级缓存：**一级缓存**和**二级缓存**
+
+- 默认情况下，只有一级缓存开启。（SqlSession级别的缓存，也称为本地缓存）
+- 二级缓存需要手动开启和配置，他是基于namespace级别的缓存。
+- 为了提高扩展性，MyBatis定义了缓存接口Cache。我们可以通过实现Cache接口来自定义二级缓存
+
+###### 14.2、一级缓存
+
+1. 一级缓存也叫本地缓存：
+
+   * 与数据库同一次会话期间查询到的数据会放在本地缓存中。
+   * 以后如果需要获取相同的数据，直接从缓存中拿，没必须再去查询数据库；
+
+2. 一级缓存失效的四种情况
+
+   > *a*. 一级缓存是SqlSession级别的缓存，是一直开启的，我们关闭不了它；
+   >
+   > *b*. 一级缓存失效情况：没有使用到当前的一级缓存，效果就是，还需要再向数据库中发起一次查询请求！
+
+   * sqlSession不同
+
+     ```java
+     @Test
+     public void testQueryUserById(){
+        SqlSession session = MybatisUtils.getSession();
+        SqlSession session2 = MybatisUtils.getSession();
+        UserMapper mapper = session.getMapper(UserMapper.class);
+        UserMapper mapper2 = session2.getMapper(UserMapper.class);
+     
+        User user = mapper.queryUserById(1);
+        System.out.println(user);
+        User user2 = mapper2.queryUserById(1);
+        System.out.println(user2);
+        System.out.println(user==user2);
+     
+        session.close();
+        session2.close();
+     }
+     // 观察结果：发现发送了两条SQL语句！
+     // 结论：每个sqlSession中的缓存相互独立
+     ```
+
+   * sqlSession相同，查询条件不同
+
+   * sqlSession相同，两次查询之间执行了**增删改**操作！
+
+   * sqlSession相同，手动清除一级缓存
+
+     ```java
+     @Test
+     public void testQueryUserById(){
+        SqlSession session = MybatisUtils.getSession();
+        UserMapper mapper = session.getMapper(UserMapper.class);
+     
+        User user = mapper.queryUserById(1);
+        System.out.println(user);
+     
+        session.clearCache();//手动清除缓存
+     
+        User user2 = mapper.queryUserById(1);
+        System.out.println(user2);
+     
+        System.out.println(user==user2);
+     
+        session.close();
+     }
+     ```
+
+###### 14.3、二级缓存
+
+1. 简介
+
+   - 二级缓存也叫**全局缓存**，一级缓存作用域太低了，所以诞生了二级缓存
+
+   - 基于**namespace**级别的缓存，一个名称空间，对应一个二级缓存；
+
+   - 工作机制
+
+   - - 一个会话查询一条数据，这个数据就会被放在当前会话的一级缓存中；
+     - 如果当前会话关闭了，这个会话对应的一级缓存就没了；但是我们想要的是，会话关闭了，一级缓存中的数据被保存到二级缓存中；
+     - 新的会话查询信息，就可以从二级缓存中获取内容；
+     - 不同的mapper查出的数据会放在自己对应的缓存（map）中；
+
+2. 使用步骤
+
+   * 开启全局缓存 【mybatis-config.xml】
+
+     ```xml
+     <setting name="cacheEnabled" value="true"/>
+     ```
+
+   * 去每个mapper.xml中配置使用二级缓存，这个配置非常简单；【xxxMapper.xml】
+
+     ```xml
+     <cache/>
+     
+     官方示例=====>查看官方文档
+     <cache
+      eviction="FIFO"
+      flushInterval="60000"
+      size="512"
+      readOnly="true"/>
+     这个更高级的配置创建了一个 FIFO 缓存，每隔 60 秒刷新，最多可以存储结果对象或列表的 512 个引用，而且返回的对象被认为是只读的，因此对它们进行修改可能会在不同线程中的调用者产生冲突。
+     ```
+
+   * 代码测试
+
+     ```java
+     @Test
+     public void testQueryUserById(){
+        SqlSession session = MybatisUtils.getSession();
+        SqlSession session2 = MybatisUtils.getSession();
+     
+        UserMapper mapper = session.getMapper(UserMapper.class);
+        UserMapper mapper2 = session2.getMapper(UserMapper.class);
+     
+        User user = mapper.queryUserById(1);
+        System.out.println(user);
+        session.close();
+     
+        User user2 = mapper2.queryUserById(1);
+        System.out.println(user2);
+        System.out.println(user==user2);
+     
+        session2.close();
+     }
+     ```
+
+3. 结论
+
+   - 只要开启了二级缓存，我们在同一个Mapper中的查询，可以在二级缓存中拿到数据
+   - 查出的数据都会被默认先放在一级缓存中
+   - 只有会话提交或者关闭以后，一级缓存中的数据才会转到二级缓存中
+
+4. 缓存原理图
+
+![image-20200518201042376](C:\Users\10715\AppData\Roaming\Typora\typora-user-images\image-20200518201042376.png)
+
+5. EhCache
+
