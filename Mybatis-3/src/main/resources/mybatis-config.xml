@@ -14,7 +14,8 @@
 
     <!-- 给实体类设置别名 -->
     <typeAliases>
-        <typeAlias alias="user" type="com.jxy.pojo.Teacher"/>
+        <typeAlias alias="Teacher" type="com.jxy.pojo.Teacher"/>
+        <typeAlias alias="Student" type="com.jxy.pojo.Student"/>
         <!-- 使用扫描包的方式起别名，默认使用实体类名的小写开头的名称-->
         <!--        <package name="com.jxy.pojo"/>-->
     </typeAliases>

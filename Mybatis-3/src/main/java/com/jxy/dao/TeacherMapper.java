@@ -7,4 +7,8 @@ import org.apache.ibatis.annotations.Select;
 public interface TeacherMapper {
     @Select("select * from Mybatis.teacher where #{tid}")
     Teacher getTeacherById(@Param("tid") int id);
+
+    Teacher getTeacherById1(@Param("tid") int id);
+
+    Teacher getTeacherById2(@Param("tid") int id);
 }

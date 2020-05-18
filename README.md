@@ -253,7 +253,7 @@ List<User> userList = mapper.getUserLimit(map);
 
 ###### 10.4Lombok的使用
 
-##### 11、多对一的处理
+##### 11、多对一的处理 --> association
 
 ###### （1）表的创建
 
@@ -282,4 +282,83 @@ INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('5', '小王', '1');
 ```
 
 ###### （2）环境搭建
+
+###### （3）查询xml编写
+
+* 嵌套查询模式
+
+```xml
+<!--    类似于一个嵌套查询-->
+<select id="getStudentList1" resultType="Student" resultMap="StudentTeacher">
+    select * from student;
+</select>
+<resultMap id="StudentTeacher" type="Student">
+    <result property="id" column="id"></result>
+    <result property="name" column="name"></result>
+    <association property="teacher" column="tid" javaType="Teacher" select="getTeacher"></association>
+</resultMap>
+<select id="getTeacher" resultType="Teacher">
+    select * from teacher;
+</select>
+```
+
+* 关联查询模式（结果驱动的，由SQL语句编写xml语句）
+
+```xml
+<!--    结果驱动，由一个关联查询语句进行相应编写-->
+<select id="getStudentList2" resultType="Student" resultMap="StudentTeacher2">
+    select s.id as sid,s.name sname, t.name tname, t.id tid
+    from student as s ,teacher t
+    where s.tid = t.id;
+</select>
+<resultMap id="StudentTeacher2" type="Student">
+    <result property="id" column="sid"></result>
+    <result property="name" column="sname"></result>
+    <association property="teacher" javaType="Teacher">
+        <result property="id" column="tid"></result>
+        <result property="name" column="tname"></result>
+    </association>
+</resultMap>
+```
+
+##### 12、一对多的处理 --> collection
+
+###### （1）关联查询模式
+
+```xml
+<mapper namespace="com.jxy.dao.TeacherMapper">
+    <select id="getTeacherById1" resultMap="TeacherStudent">
+        select s.id sid,s.name sname,t.id tid,t.name tname
+        from teacher t,student s
+        where t.id = #{tid} and s.tid = t.id;
+    </select>
+    <resultMap id="TeacherStudent" type="Teacher">
+        <result property="id" column="tid"></result>
+        <result property="name" column="tname"></result>
+        <collection property="students" ofType="Student">
+            <result property="id" column="sid"></result>
+            <result property="name" column="sname"></result>
+            <result property="tid" column="tid"></result>
+        </collection>
+    </resultMap>
+```
+
+###### （2）子查询模式（嵌套查询）
+
+```xml
+<select id="getTeacherById2" resultMap="TeacherStudent2">
+    select id,name from teacher where id=#{tid};
+</select>
+<resultMap id="TeacherStudent2" type="Teacher">
+    <result property="id" column="id"></result>
+    <result property="name" column="name"></result>
+    <collection property="students" javaType="ArrayList" ofType="Student" select="getStudentsByTeacherId" column="id"></collection>
+</resultMap>
+
+<select id="getStudentsByTeacherId" resultType="Student">
+    select *
+    from student
+    where tid=#{tid}
+</select>
+```
 
