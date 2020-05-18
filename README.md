@@ -362,3 +362,172 @@ INSERT INTO `student` (`id`, `name`, `tid`) VALUES ('5', '小王', '1');
 </select>
 ```
 
+##### 13、动态SQL
+
+**数据库表的创建**
+
+```sql
+CREATE TABLE `blog` (
+`id` varchar(50) NOT NULL COMMENT '博客id',
+`title` varchar(100) NOT NULL COMMENT '博客标题',
+`author` varchar(30) NOT NULL COMMENT '博客作者',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`views` int(30) NOT NULL COMMENT '浏览量'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+```
+
+###### （1）if
+
+```xml
+<select id="queryBlogIf" parameterType="map" resultType="Blog">
+    select * from blog where
+    <if test="title != null">
+        title = #{title}
+    </if>
+    <if test="author != null">
+        and author = #{author}
+    </if>
+</select>
+```
+
+###### （2）where +if
+
+**这个“where”标签会知道如果它包含的标签中有返回值的话，它就插入一个‘where’。此外，如果标签返回的内容是以AND 或OR 开头的，则它会剔除掉。**
+
+```xml
+<select id="queryBlogIf" parameterType="map" resultType="blog">
+  select * from blog
+   <where>
+       <if test="title != null">
+          title = #{title}
+       </if>
+       <if test="author != null">
+          and author = #{author}
+       </if>
+   </where>
+</select>
+```
+
+###### （3）set + if
+
+set**标签主要用于去除更新语句中条件后面的逗号**
+
+```xml
+<!--注意set是用的逗号隔开-->
+<update id="updateBlog" parameterType="map">
+  update blog
+     <set>
+         <if test="title != null">
+            title = #{title},
+         </if>
+         <if test="author != null">
+            author = #{author}
+         </if>
+     </set>
+  where id = #{id};
+</update>
+```
+
+###### （4）where + choose + when + otherwise
+
+有时候，我们不想用到所有的查询条件，**只想选择其中的一个**，查询条件有一个满足即可，使用 choose 标签可以解决此类问题，**类似于 Java 的 switch 语句**
+
+> 其中在有otherwise标签的情况下，需要至少一个参数；
+>
+> 但是在没有otherwise的情况下，可以不提供任何参数；
+
+```xml
+<select id="queryBlogChoose" parameterType="map" resultType="blog">
+  select * from blog
+   <where>
+       <choose>
+           <when test="title != null">
+                title = #{title}
+           </when>
+           <when test="author != null">
+              and author = #{author}
+           </when>
+           <otherwise>
+              and views = #{views}
+           </otherwise>
+       </choose>
+   </where>
+</select>
+```
+
+###### （5）SQL代码片段
+
+**有时候可能某个 sql 语句我们用的特别多，为了增加代码的重用性，简化代码，我们需要将这些代码抽取出来，然后使用时直接调用。**
+
+1. 提取SQL片段
+
+```xml
+<sql id="if-title-author">
+   <if test="title != null">
+      title = #{title}
+   </if>
+   <if test="author != null">
+      and author = #{author}
+   </if>
+</sql>
+```
+
+2. 引用SQL片段
+
+```xml
+<select id="queryBlogIf" parameterType="map" resultType="blog">
+  select * from blog
+   <where>
+       <!-- 引用 sql 片段，如果refid 指定的不在本文件中，那么需要在前面加上 namespace -->
+       <include refid="if-title-author"></include>
+       <!-- 在这里还可以引用其他的 sql 片段 -->
+   </where>
+</select>
+```
+
+> 注意：
+>
+> 1. 最好基于单表来定义SQL片段，提高片段的可重用性；
+>
+> 2. 在 sql 片段中不要包括 where
+
+###### （6）foreach
+
+```xml
+<select id="queryBlogForeach" parameterType="map" resultType="blog">
+  select * from blog
+   <where>
+       <!--
+       collection:指定输入对象中的集合属性
+       item:每次遍历生成的对象
+       open:开始遍历时的拼接字符串
+       close:结束时拼接的字符串
+       separator:遍历对象之间需要拼接的字符串
+       select * from blog where 1=1 and (id=1 or id=2 or id=3)
+     -->
+       <foreach collection="ids"  item="id" open="and (" close=")" separator="or">
+          id=#{id}
+       </foreach>
+   </where>
+</select>	
+```
+
+```xml
+<select id="queryBlogForeach2" parameterType="list" resultType="blog">
+    select * from blog
+    <!--
+        1. 表达式变成了 select * from blog where id (1,2,3)
+        2. 参数的传入由map类型变成了list类型
+        3. 加入了list为null时的判断
+    -->
+    <if test="list != null">
+        <where>
+            id in
+            <foreach collection="list"  item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </if>
+</select>
+```
+

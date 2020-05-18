@@ -6,16 +6,20 @@
     <!-- 引入外部配置文件 -->
     <properties resource="db.properties"/>
 
-    <!-- 日志设置 -->
+
     <settings>
-<!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
-        <setting name="logImpl" value="LOG4J"/>
+        <!-- 驼峰命名 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 日志设置 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+<!--        <setting name="logImpl" value="LOG4J"/>-->
     </settings>
 
     <!-- 给实体类设置别名 -->
     <typeAliases>
         <typeAlias alias="Teacher" type="com.jxy.pojo.Teacher"/>
         <typeAlias alias="Student" type="com.jxy.pojo.Student"/>
+        <typeAlias alias="Blog" type="com.jxy.pojo.Blog"/>
         <!-- 使用扫描包的方式起别名，默认使用实体类名的小写开头的名称-->
         <!--        <package name="com.jxy.pojo"/>-->
     </typeAliases>
@@ -36,5 +40,6 @@
 <!--        <mapper resource="com/jxy/dao/*.xml"/>-->
         <mapper class="com.jxy.dao.TeacherMapper"></mapper>
         <mapper class="com.jxy.dao.StudentMapper"></mapper>
+        <mapper class="com.jxy.dao.BlogMapper"></mapper>
     </mappers>
 </configuration>
